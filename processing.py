@@ -29,9 +29,9 @@ def process_transactions(cnx=None, cursor=None):
 
 def main():
     cnx, cursor = get_db_connection()
-    cursor.execute("USE financetracker")
     if cnx and cursor:
         try:
+            cursor.execute("USE financetracker")
             process_transactions(cnx=cnx, cursor=cursor)
         finally:
             cursor.close()

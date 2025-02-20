@@ -7,7 +7,8 @@ def get_db_connection():
         cnx = mysql.connector.connect(user=DB_USER, 
                                     password=DB_PASSWORD,
                                     host=DB_HOST,
-                                    port=DB_PORT)
+                                    port=DB_PORT,
+                                    database="financetracker")
         print("Connected successfully!")
         cursor = cnx.cursor()
         return cnx, cursor 

@@ -1,23 +1,9 @@
-import mysql.connector
 import pandas as pd
 import os
 import numpy as np
-from constants import *
+from db_connect import get_db_connection
 
-def get_db_connection():
-    print("Attempting to connect...")
-    try:
-        cnx = mysql.connector.connect(user=DB_USER, 
-                                    password=DB_PASSWORD,
-                                    host=DB_HOST,
-                                    port=DB_PORT)
-        print("Connected successfully!")
-        cursor = cnx.cursor()
-        cursor.execute("USE financetracker")
-        return cnx, cursor
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        return None, None
+
 
 def import_revolut_statements(folder_path="statements", cnx=None, cursor=None):
     if not (cnx and cursor):
@@ -58,6 +44,35 @@ def import_revolut_statements(folder_path="statements", cnx=None, cursor=None):
     if not csv_files:
         print("No CSV files found in statements folder")
         return
+
+def live_import_csv(uploaded_file, cnx=None, cursor=None):
+    cursor.execute("USE financetracker")
+    cnx, cursor = get_db_connection()
+    df = pd.read_csv(uploaded_file)
+    df = df.replace({np.nan: None})
+    for _, row in df.iterrows():
+            cursor.execute("""
+        INSERT IGNORE INTO raw_transactions_revolut 
+        (type, product, started_date, completed_date, description, 
+         amount, fee, currency, state, balance)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, tuple(row))
+    cnx.commit()
+
+    cursor.execute("""
+        SELECT started_date, completed_date, description, amount, fee, currency
+                   FROM raw_transactions_revolut 
+            WHERE STATE != "REVERTED"        
+    """,)
+
+    rows = cursor.fetchall()
+    for row in rows:
+        cursor.execute("""
+        INSERT IGNORE INTO Processed_transactions 
+                       (started_date, completed_date, description, 
+         amount, fee, currency) VALUES (%s, %s, %s, %s, %s, %s)
+        """, row)
+    cnx.commit()
 
 def main():
     cnx, cursor = get_db_connection()
