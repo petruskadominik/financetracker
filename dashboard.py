@@ -4,8 +4,10 @@ from import_csv import live_import_csv
 from db_connect import get_db_connection
 from queries import *
 from processing import process_transactions
+from rules import *
 import matplotlib.pyplot as plt
 import plotly.express as px
+
 
 
 def dashboard(cnx, cursor):
@@ -30,14 +32,13 @@ def dashboard(cnx, cursor):
     df = df.sort_values(by="Date", ascending=False)
     st.write("Recent Transactions")
     st.dataframe(df)
-    st.subheader('Spending by Bucket')
+    
     
     
     by_month = fetch_total_by_month(cnx, cursor)
     for row in by_month:
         month, total, count = row
-        print(f"Month: {month}, Total Amount: {total}, Transactions: {count}")
-
+    st.subheader('Spending by Bucket')
     df = pd.DataFrame(by_month)
     df.columns = ["Date", "Total", "Transaction count"]
     st.dataframe(df)
@@ -51,8 +52,6 @@ def dashboard(cnx, cursor):
     long_df = df.melt(id_vars=["Bucket"], var_name="month", value_name="amount")
     long_df['amount'] = long_df['amount'].abs()
     st.dataframe(long_df)
-    print(long_df.keys())
-
     # Create the stacked bar chart using Plotly Express
     fig = px.bar(
         long_df,                   # DataFrame in long format
@@ -72,6 +71,51 @@ def dashboard(cnx, cursor):
 
     fig = px.line(long_df, x='month', y='amount',color='Bucket')
     st.plotly_chart(fig)
+
+    st.subheader('Uncategorized transactions')
+    df = pd.DataFrame(fetch_uncategorised_txn(cnx, cursor))
+    st.dataframe(df)
+    
+
+    
+   
+    # Initialize session state variables if they don't exist
+    if "selected_category" not in st.session_state:
+        st.session_state.selected_category = list(options.keys())[0]  # Default to first category
+    if "selected_value" not in st.session_state:
+        st.session_state.selected_value = options[st.session_state.selected_category][0]
+    if "text_input" not in st.session_state:
+        st.session_state.text_input = ""
+
+    # Function to update second dropdown when category changes
+    def update_values():
+        st.session_state.selected_value = options[st.session_state.selected_category][0]
+
+    # Text input (used as dictionary key)
+    text_input = st.text_input("Enter a name (Key):", st.session_state.text_input)
+
+    # First dropdown (select category)
+    category_index = list(options.keys()).index(st.session_state.selected_category)  # Get the index of selected category
+    selected_category = st.selectbox(
+        "Choose a category:", 
+        list(options.keys()), 
+        index=category_index,  # Set default selection based on session state
+        key="selected_category",
+        on_change=update_values  # When changed, update second dropdown
+    )
+
+    # Second dropdown (updates dynamically)
+    selected_value = st.selectbox(
+        f"Choose a value from {st.session_state.selected_category}:",
+        options[st.session_state.selected_category],
+        key="selected_value"
+    )
+
+    # Submit button
+    if st.button("Submit"):
+        output_dict = {text_input: [selected_category, selected_value]}
+        st.write("Generated Dictionary:", output_dict)
+
 
     
 def main():

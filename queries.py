@@ -31,10 +31,11 @@ ORDER BY month_group desc
     return data
 
 def fetch_all_transactions_buckets(cnx, cursor):
-    cursor.execute("USE financetracker")
+    
     if not (cnx and cursor):
             print("No database connection!")
             return
+    cursor.execute("USE financetracker")
     cursor.execute("SELECT MIN(started_date) FROM processed_transactions WHERE started_date IS NOT NULL")
     oldest_date = cursor.fetchone()[0]
 
@@ -75,9 +76,16 @@ def fetch_all_transactions_buckets(cnx, cursor):
     return results, months
 
 
-
+def fetch_uncategorised_txn(cnx, cursor):
+    if not (cnx and cursor):
+        print("No database connection!")
+        return
+            
+     
+    cursor.execute("""USE financetracker""")
+    cursor.execute("""
+                   SELECT * FROM processed_transactions
+                   WHERE bucket is null and subcat is null""")
     
-
-
-      
-
+    data = cursor.fetchall()
+    return data
