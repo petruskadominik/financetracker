@@ -1,6 +1,8 @@
 from db_connect import get_db_connection
 import pandas as pd
-from rules import rules 
+from rules import *
+import os
+import json
 
 def process_transactions(cnx=None, cursor=None):
     if not (cnx and cursor):
@@ -10,9 +12,11 @@ def process_transactions(cnx=None, cursor=None):
     cursor.execute("""
         SELECT id, description, amount FROM Processed_transactions WHERE BUCKET is NULL        
     """,)
+    
+    RULES_FILE = "rules.json"
+    rules = load_rules(RULES_FILE)
 
     rows = cursor.fetchall()
-    print(rows[1])
     for key in rules: 
         for row in rows:
             if key in row[1]:
@@ -24,7 +28,11 @@ def process_transactions(cnx=None, cursor=None):
         """,(bucket, subcat, row[0]))
     cnx.commit()
 
-
+def load_rules(RULES_FILE):
+        if os.path.exists(RULES_FILE):
+            with open(RULES_FILE, "r") as file:
+                return json.load(file)
+            return
 
 
 def main():

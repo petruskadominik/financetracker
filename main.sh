@@ -1,2 +1,2 @@
 python3 setup.py
-streamlit run dashboard.py 
+streamlit run dev_dashboard.py 
