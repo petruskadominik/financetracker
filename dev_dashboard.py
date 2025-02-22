@@ -27,27 +27,48 @@ def dashboard(cnx, cursor):
         live_import_csv(uploaded_file, cnx, cursor)
         process_transactions(cnx, cursor)
 
+    # Monthly summary
 
-    # Automatically read the CSV into a DataFrame
+    bucketed, months = fetch_all_transactions_buckets(cnx, cursor)
+    monthly_txn = pd.DataFrame(bucketed)
+    selected_month = st.selectbox(
+    'Select Month',
+    months,
+    index=len(months)-1
+)   
+    st.write(selected_month)
+    names = ["Bucket"] + months
+    monthly_txn.columns = names 
+    #Pie chart
+    st.write("piechart")
+    
+    selected_month_data = monthly_txn[['Bucket', selected_month]]
+    st.dataframe(selected_month_data)
+
+    chart_data = selected_month_data[selected_month_data.iloc[:, 1] != 0].copy()
+    chart_data.iloc[:, 1] = chart_data.iloc[:, 1].abs()
+
+    # Using plotly for more customization
+    import plotly.express as px
+
+    fig = px.pie(
+        chart_data, 
+        values=chart_data.columns[1],  # The column with values
+        names='Bucket',  # The column with categories
+        #title=f'Expenses for {selected_month}'
+    )
+    fig.update_traces(hovertemplate="%{label}<br>%{value:.2f} €<extra></extra>")
+    st.plotly_chart(fig)
+    # Line chart of bucketed with total
     
     data = fetch_all_transactions(cnx, cursor)
     df = pd.DataFrame(data)
-    df.columns = ["Date", "Description", "Amount", "Currency", "Fee", "Bucket", "Subcat"]
+    df.columns = ["Date", "Description", "Amount", "Fee", "Currency", "Bucket", "Subcat"]
     df = df.sort_values(by="Date", ascending=False)
     st.write("Recent Transactions")
     st.dataframe(df)
     
-    
-    
-    by_month = fetch_total_by_month(cnx, cursor)
-    for row in by_month:
-        month, total, count = row
-    st.subheader('Spending by Bucket')
-    df = pd.DataFrame(by_month)
-    df.columns = ["Date", "Total", "Transaction count"]
-    st.dataframe(df)
-
-    bucketed, months = fetch_all_transactions_buckets(cnx, cursor)
+    bucketed, months = fetch_all_transactions_buckets_with_total(cnx, cursor)
     df = pd.DataFrame(bucketed)
     st.write("Bucketed Transactions")
     names = ["Bucket"] + months
@@ -55,7 +76,6 @@ def dashboard(cnx, cursor):
     st.dataframe(df)
     long_df = df.melt(id_vars=["Bucket"], var_name="month", value_name="amount")
     long_df['amount'] = long_df['amount'].abs()
-    st.dataframe(long_df)
     # Create the stacked bar chart using Plotly Express
     fig = px.bar(
         long_df,                   # DataFrame in long format
@@ -67,11 +87,6 @@ def dashboard(cnx, cursor):
     )
 
     # Display the chart in Streamlit
-    st.plotly_chart(fig)
-
-    #stacked line chart
-    fig = px.area(long_df, x='month', y='amount', line_group='Bucket', color='Bucket')
-    st.plotly_chart(fig)
 
     fig = px.line(long_df, x='month', y='amount',color='Bucket')
     st.plotly_chart(fig)
@@ -79,7 +94,6 @@ def dashboard(cnx, cursor):
     
     uncategorized = pd.DataFrame(fetch_uncategorised_txn(cnx, cursor))
     if not uncategorized.empty:
-        print("Wee!")
         st.subheader('Uncategorized transactions')
         st.dataframe(uncategorized)
     
@@ -129,6 +143,31 @@ def dashboard(cnx, cursor):
             print(output_dict)
             st.write("Generated Dictionary:", output_dict)
             process_transactions(cnx, cursor)
+
+
+    # Stacked bar chart
+    data = fetch_all_transactions(cnx, cursor)
+    df = pd.DataFrame(data)
+    df.columns = ["Date", "Description", "Amount", "Fee", "Currency", "Bucket", "Subcat"]
+    df = df.sort_values(by="Date", ascending=False)    
+    bucketed, months = fetch_all_transactions_buckets(cnx, cursor)
+    df = pd.DataFrame(bucketed)
+    names = ["Bucket"] + months
+    df.columns = names
+    long_df = df.melt(id_vars=["Bucket"], var_name="month", value_name="amount")
+    long_df['amount'] = long_df['amount'].abs()
+    # Create the stacked bar chart using Plotly Express
+    fig = px.bar(
+        long_df,                   # DataFrame in long format
+        x="month",                 # X-axis: Months
+        y="amount",                # Y-axis: Amount spent
+        color="Bucket",            # Stacked by bucket/category
+        title="Spending by Month and Category (Stacked)",
+        labels={"amount": "Amount ($)", "month": "Month", "bucket": "Category"}
+    )
+
+    # Display the chart in Streamlit
+    st.plotly_chart(fig)
         
 def load_rules(RULES_FILE):
         if os.path.exists(RULES_FILE):
