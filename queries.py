@@ -7,7 +7,7 @@ def fetch_all_transactions(cnx, cursor):
             print("No database connection!")
             return
     cursor.execute("""
-        SELECT started_date, description, amount, fee, currency, bucket, subcat
+        SELECT id, started_date, description, amount, fee, currency, bucket, subcat
                    FROM Processed_transactions        
     """,)
     data = cursor.fetchall()
@@ -76,7 +76,7 @@ def fetch_all_transactions_buckets(cnx, cursor):
     if not oldest_date:
         print("No transactions found.")
         cursor.close()
-        conn.close()
+        cnx.close()
         exit()
 
     current_date = datetime.now()

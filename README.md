@@ -17,16 +17,16 @@ Currently only supports CSV statements from Revolut Bank
 1. Clone the repository
 2. Copy `constants_template.py` to `constants.py`
 3. Update database credentials in `constants.py`
-4. Run setup.py (This will connect to your DBServer create nessesary Database and tables if not created already)
-5. Import your statements to ~/statements
-6. Run import.py (This will import all statements from ~/statements ignoring duplicate transactions)
+4. Run ./main.sh (this will connect to databease create tables, and creates streamlit dashboard available at http://localhost:8501)
 
 
 ## Current Features
 1. Communication with MySQL server
 2. Creating DB and tables required for Financetracker
-3. Importing Revolut bank statement in CSV format
+3. Importing Revolut bank statement in CSV format via webui
+4. Transaction filtering
+5. Display data on dashboard, edit DB entries on dashboard
 
-## WIP Features
-1. Categorisation of transactions
-2. GUI display of data
+## Ideas for future
+1. Add more csv format support(probably just banks i use)
+2. Add profiles that would have acess to different tables(so that i could deferentiate between my and shared finanes)

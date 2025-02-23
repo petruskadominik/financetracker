@@ -1,8 +1,4 @@
 {
-    "Lidl": [
-        "Groceries",
-        "Lidl"
-    ],
     "BioTechUSA": [
         "Groceries",
         "Misc"
@@ -27,17 +23,9 @@
         "Groceries",
         "Billa"
     ],
-    "Tesco": [
-        "Groceries",
-        "Tesco"
-    ],
     "Potraviny Malina": [
         "Groceries",
         "Malina"
-    ],
-    "Terno": [
-        "Groceries",
-        "Terno"
     ],
     "Farm House EU": [
         "Groceries",
@@ -607,10 +595,6 @@
         "takeout",
         "caf\u00e9"
     ],
-    "La Donuteria": [
-        "takeout",
-        "takeout"
-    ],
     "Lomada S. R. O.": [
         "takeout",
         "takeout"
@@ -1090,5 +1074,21 @@
     "Hotel Dev\u00edn": [
         "Entertainment",
         "Entertainment"
+    ],
+    "Terno": [
+        "Groceries",
+        "Terno"
+    ],
+    "Lidl": [
+        "Groceries",
+        "Lidl"
+    ],
+    "Tesco": [
+        "Groceries",
+        "Tesco"
+    ],
+    "La Donuteria": [
+        "takeout",
+        "takeout"
     ]
 }

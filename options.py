@@ -1,0 +1,17 @@
+options = {
+    'Alza' : ('Alza',),
+    'Cash' : ('ATM', 'Sending money'),
+    'Clothes' :	('Clothes',),
+    'Domino' : ('Domino',),
+    'Drogerie' : ('DM', 'cinema' '101 Drogerie', 'Notino', 'Misc', 'TETA'),
+    'Entertainment' : ('subscriptions', 'misc', 'gift', 'billiard', 'cinema', 'concert tickets', 'kpop', 'dance', 'Sport Stuff', 'meeting strangers', 'fun toy wink wink'),
+    'Groceries' : ('Lidl', 'Kaufland', 'Malina', 'Misc', 'Kraj', 'Yeme', 'Tesco', 'Billa', 'Terno', 'Studenac', 'Konzum', 'Spar'),
+    'Health' : ('medicine',),
+    'Home' : ('IKEA', 'Misc', 'Xmas', 'printing', 'vacuum hose', 'JYSK', 'Kitchen', 'Electronics', 'HORNBACH'),
+    'Maggie' : ('Maggie',),
+    'Pet' :	('Food/Sand', 'Vet'),
+    'Receiving money' :	('Receiving money',),
+    'takeout' :	('takeout', 'Ice cream', 'Wolt', 'restaurant', 'café', 'Bistro', 'Smoothie', 'drinks', 'Mall', 'xmas market'),
+    'Taxi' : ('Bolt',),
+    'travel' : ('Kosice/Travel around Slovakia', 'Airbnb', 'fuckin London', 'Plane tickets', 'travel', 'FlixBus', 'Brno'),
+}

@@ -1,6 +1,5 @@
 from db_connect import get_db_connection
 import pandas as pd
-from rules import *
 import os
 import json
 
